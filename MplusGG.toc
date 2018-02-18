@@ -1,0 +1,10 @@
+## Interface: 70300
+## Title: Mplus.gg
+## Notes: Shows the Mplus.gg Score in the tooltip and LFG
+## Author: Lilyelhu & Portmeplz
+## Version: 7.3.5 (@project-version@)
+## SavedVariables: MplusGG_Config
+## X-Website: https://mplus.gg
+
+core.lua
+core.xml
