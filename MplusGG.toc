@@ -7,9 +7,11 @@
 ## X-Website: https://mplus.gg
 
 
-
+LabelXML.xml
 core.lua
 core.xml
 
 db/db_eu_alliance_characters.lua
 db/db_eu_alliance_score_karma.lua
+db/db_eu_horde_characters.lua
+db/db_eu_horde_score_karma.lua
