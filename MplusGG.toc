@@ -6,7 +6,7 @@
 ## SavedVariables: MplusGG_Config
 ## X-Website: https://mplus.gg
 
-
+db/realm_slug_Map.lua
 LabelXML.xml
 core.lua
 core.xml

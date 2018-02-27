@@ -70,8 +70,8 @@ end
 -- Decodes score and karma from table
 local function updateTooltip(characterName, characterRealm, factionGroup)
 	if login == nil and playerFaction == factionID[factionGroup] then
-		fixedCharacterRealm = string.gsub(characterRealm, "%W", "_");
-		index = "eu" .. faction[factionGroup] .. fixedCharacterRealm
+		fixedCharacterRealm = string.gsub(characterRealm, "%s", "");
+		index = "eu" .. faction[factionGroup] .. db.realmMap[fixedCharacterRealm]
 		for i, name in ipairs(localDatabase.characters[index]) do
 			if name == characterName then
 				temp = localDatabase.scores_karma[index][i]
@@ -201,8 +201,8 @@ function getScoreString(name)
 	end
 	characterName = characterName:gsub('[%-]', "")
 	realm = realm:gsub("%-", "")
-	fixedCharacterRealm = string.gsub(realm, "%W", "_")
-	index = "eu_alliance_" .. fixedCharacterRealm
+	fixedCharacterRealm = string.gsub(realm, "%s", "")
+	index = "eu_alliance_" .. db.realmMap[fixedCharacterRealm]
 	for i, name in ipairs(localDatabase.characters[index]) do
 		if name == characterName then
 			temp = localDatabase.scores_karma[index][i]
