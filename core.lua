@@ -156,13 +156,11 @@ local function updateLFG()
 		if applicantName ~= "Name" then
 			appID = child.Member1:GetParent().applicantID
 			Idx = child.Member1.memberIdx
-			child.Member1.ScoreLabel:SetTextColor(0.5,0.5,0.5,1)
-				--Idx = memberchild.memberIdx
-			name, class, localizedClass, level, itemLevel, honorLevel, tank, healer, damage, assignedRole, relationship = C_LFGList.GetApplicantMemberInfo(appID, Idx);
-			
-			child.Member1.ScoreLabel:SetText(getScoreString(name))
-				--memberChild.ScoreLabel:SetText(getScoreString(name))
-			--end
+			if appID ~= nil and Idx ~= nil then 
+				name, class, localizedClass, level, itemLevel, honorLevel, tank, healer, damage, assignedRole, relationship = C_LFGList.GetApplicantMemberInfo(appID, Idx);
+				child.Member1.ScoreLabel:SetTextColor(0.5,0.5,0.5,1)
+				child.Member1.ScoreLabel:SetText(getScoreString(name))
+			end
 		end
 	end
 end
@@ -196,27 +194,24 @@ function updateLFGVisibility(wide)
 end
 
 function getScoreString(name)
-	local characterName = name:match('[%c]+[-]')
-	realm = name:match('[-][%c]+')
+	local characterName = name:match('[%a]+[-]*')
+	local realm = name:match('[-][%a]+')
+	if  realm == "" or realm == nil then
+		realm = GetRealmName()
+	end
 	characterName = characterName:gsub('[%-]', "")
 	realm = realm:gsub("%-", "")
-	print(characterName)
-	print(realm)
-	fixedCharacterRealm = string.gsub(realm, "%W", "_");
-	index = "eu" .. "alliance" .. fixedCharacterRealm
+	fixedCharacterRealm = string.gsub(realm, "%W", "_")
+	index = "eu_alliance_" .. fixedCharacterRealm
 	for i, name in ipairs(localDatabase.characters[index]) do
 		if name == characterName then
 			temp = localDatabase.scores_karma[index][i]
 				score = temp:match('[%d]+[_]')
 				karma = temp:match('[_][%d]+')
-				if score ~= "" then 
-					return "Score: " ..score .. " Karma: " .. karma
-				else
-					return "No Score available" 
-				end
-		end
+					return "Score: " ..score:gsub('[%W]', "") .. " Karma: " .. karma:gsub('[%W]', "")
+		end 
 	end 
-
+	return "No Score available" 
 end
 -- HandelEvents here
 local function onevent(self, event, arg1, ...)
