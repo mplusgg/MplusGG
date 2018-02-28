@@ -194,13 +194,10 @@ function updateLFGVisibility(wide)
 end
 
 function getScoreString(name)
-	local characterName = name:match('[%a]+[-]*')
-	local realm = name:match('[-][%a]+')
+	local characterName, realm = string.match(name, "(.*)%-(.*)")
 	if  realm == "" or realm == nil then
 		realm = GetRealmName()
 	end
-	characterName = characterName:gsub('[%-]', "")
-	realm = realm:gsub("%-", "")
 	fixedCharacterRealm = string.gsub(realm, "%s", "")
 	index = "eu_alliance_" .. db.realmMap[fixedCharacterRealm]
 	for i, name in ipairs(localDatabase.characters[index]) do

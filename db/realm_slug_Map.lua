@@ -1,4 +1,4 @@
-local _,db = ...;
+local db = ...;
 db.realmMap = {
 ["Aggramar"] = "aggramar",
 ["Arathor"] = "arathor",
