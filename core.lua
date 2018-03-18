@@ -21,6 +21,15 @@ local login = true
 local playerFaction
 local wipe = table.wipe
 local showScore = true
+local startTime = 0
+
+-- RatingArray
+local rating = {
+	[1] = 0,
+	[2] = 0,
+	[3] = 0,
+	[4] = 0
+}
 
 -- Frame for Evenets 
 local frame = CreateFrame("Frame")
@@ -30,11 +39,19 @@ local frame = CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
 frame:RegisterEvent("PLAYER_LOGIN")
 frame:RegisterEvent('LFG_LIST_APPLICANT_LIST_UPDATED')
-
+frame:RegisterEvent("CHALLENGE_MODE_COMPLETED")
+frame:RegisterEvent("CHALLENGE_MODE_START")
 
 -- Array for incoming Data
 function AddDatabase(data)
 	dataBaseQueue[#dataBaseQueue + 1] = data
+end
+
+-- Initializes SavedRuns if nil
+function InitializeSavedruns()
+	if MplusGG_Runs == nil then
+		MplusGG_Runs = {}
+	end
 end
 
 -- Initializes the localDatabase from files
@@ -69,16 +86,15 @@ end
 -- Updates Data only for same faction
 -- Decodes score and karma from table
 local function updateTooltip(characterName, characterRealm, factionGroup)
-	if login == nil and playerFaction == factionID[factionGroup] then
+	if login == nil and playerFaction == factionID[factionGroup]  and characterRealm ~= "" and characterRealm ~= nil then
 		fixedCharacterRealm = string.gsub(characterRealm, "%s", "");
 		index = "eu" .. faction[factionGroup] .. db.realmMap[fixedCharacterRealm]
 		for i, name in ipairs(localDatabase.characters[index]) do
 			if name == characterName then
 				temp = localDatabase.scores_karma[index][i]
-				score = temp:match('[%d]+[_]')
-				karma = temp:match('[_][%d]+')
-				GameTooltip:AddLine("Score: " .. score:gsub('[%W]', ""))
-				GameTooltip:AddLine("Karma: " .. karma:gsub('[%W]', ""))
+				score, karma = string.match(temp,"(.*)_(.*)")
+				GameTooltip:AddLine("Score: " .. score)
+				GameTooltip:AddLine("Karma: " .. karma)
 				return
 			end
 		end
@@ -194,7 +210,7 @@ function updateLFGVisibility(wide)
 end
 
 function getScoreString(name)
-	local characterName, realm = string.match(name, "(.*)%-(.*)")
+	local characterName, realm = string.match(name, "(.*)%-/(.*)")
 	if  realm == "" or realm == nil then
 		realm = GetRealmName()
 	end
@@ -210,19 +226,225 @@ function getScoreString(name)
 	end 
 	return "No Score available" 
 end
+
+-- Handel Runs and save to Savedvariables
+function getStartTime()
+	startTime = GetServerTime()
+end
+
+function updatePartyString()
+	local string
+	for groupindex = 1,MAX_PARTY_MEMBERS do
+		if (UnitExists("party"..groupindex)) then
+			string = string .. "," .. UnitGUID("party" .. groupindex) .. "," .. rating[groupindex]
+		end
+	end
+	return string
+end
+
+-- Only if not Soloing 
+function updateRunData()
+	if generateVoteFrame() ~= nil then
+		Vote:Show()
+	end
+end
+
+function saveRunData()
+	local mapID, level, time, onTime, keystoneUpgradeLevels = C_ChallengeMode.GetCompletionInfo()
+	local instanceId = select(8,GetInstanceInfo())
+	local partyString = updatePartyString()
+	MplusGG_Runs[startTime .. "_" .. mapID .. "_" .. instanceId .. "_" .. level] = partyString
+
+end
+--Create Vote Frame
+-------------------
+--MainFrame
+-------------------
+local Vote = CreateFrame("Frame", "Vote_Frame", UIParent, "BasicFrameTemplateWithInset");
+Vote:SetSize(250, 200);
+Vote:SetPoint("CENTER"); -- Doesn't need to be ("CENTER", UIParent, "CENTER")
+
+Vote.title = Vote:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
+Vote.title:SetPoint("LEFT", Vote.TitleBg, "LEFT", 5, 0);
+Vote.title:SetText("Rate your Teammates");
+Vote:SetMovable(true)
+Vote:EnableMouse(true)
+Vote:RegisterForDrag("LeftButton")
+Vote:SetScript("OnDragStart", Vote.StartMoving)
+Vote:SetScript("OnDragStop", Vote.StopMovingOrSizing)
+Vote:Hide()
+Vote:SetScript("OnHide", saveRunData())
+-------------------
+-- Buttons
+-------------------
+local _, _, icon_up = GetSpellInfo(149539)
+local _, _, icon_down = GetSpellInfo(150068)
+local iconSize = 25
+
+--[[ GET CLASSColor
+local _, Class = UnitClass("player")
+local r,g,b,_ = GetClassColor(Class)
+:SetTextColor(r,g,b)
+]]
+
+--PartyMember 1
+Vote.upVote1 = CreateFrame("Button", nil, Vote, "GameMenuButtonTemplate");
+Vote.upVote1:SetPoint("CENTER", Vote, "TOP", 60, -55);
+Vote.upVote1:SetSize(iconSize, iconSize);
+Vote.upVote1:SetNormalTexture(icon_up)
+Vote.upVote1:SetScript("OnClick", function() rating[1] = 1 end)
+
+
+Vote.downVote1 = CreateFrame("Button", nil, Vote, "GameMenuButtonTemplate");
+Vote.downVote1:SetPoint("CENTER", Vote.upVote1, "RIGHT", 20, 0);
+Vote.downVote1:SetSize(iconSize, iconSize);
+Vote.downVote1:SetNormalTexture(icon_down)
+Vote.downVote1:SetScript("OnClick", function() rating[1] = -1 end)
+
+Vote.name1 = Vote:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+Vote.name1:SetPoint("CENTER", Vote, "TOP", -90, -55);
+Vote.name1:SetText("Member1")
+
+--PartyMember 2
+
+Vote.upVote2 = CreateFrame("Button", nil, Vote, "GameMenuButtonTemplate");
+Vote.upVote2:SetPoint("CENTER", Vote.upVote1, "TOP", 0, -50);
+Vote.upVote2:SetSize(iconSize, iconSize);
+Vote.upVote2:SetNormalTexture(icon_up)
+Vote.upVote2:SetScript("OnClick", function() rating[2] = 1 end)
+
+
+Vote.downVote2 = CreateFrame("Button", nil, Vote, "GameMenuButtonTemplate");
+Vote.downVote2:SetPoint("CENTER", Vote.upVote2, "RIGHT", 20, 0);
+Vote.downVote2:SetSize(iconSize, iconSize);
+Vote.downVote2:SetNormalTexture(icon_down)
+Vote.downVote2:SetScript("OnClick", function() rating[2] = -1 end)
+
+Vote.name2 = Vote:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+Vote.name2:SetPoint("CENTER", Vote.name1, "TOP", 0, -45);
+Vote.name2:SetText("Member2")
+
+--PartyMember 3
+
+Vote.upVote3 = CreateFrame("Button", nil, Vote, "GameMenuButtonTemplate");
+Vote.upVote3:SetPoint("CENTER", Vote.upVote2, "TOP", 0, -50);
+Vote.upVote3:SetSize(iconSize, iconSize);
+Vote.upVote3:SetNormalTexture(icon_up)
+Vote.upVote3:SetScript("OnClick", function() rating[3] = 1 end)
+
+
+Vote.downVote3 = CreateFrame("Button", nil, Vote, "GameMenuButtonTemplate");
+Vote.downVote3:SetPoint("CENTER", Vote.upVote3, "RIGHT", 20, 0);
+Vote.downVote3:SetSize(iconSize, iconSize);
+Vote.downVote3:SetNormalTexture(icon_down)
+Vote.downVote3:SetScript("OnClick", function() rating[3] = -1 end)
+
+Vote.name3 = Vote:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+Vote.name3:SetPoint("CENTER", Vote.name2, "TOP", 0, -41);
+Vote.name3:SetText("Member3")
+
+--PartyMember 4
+
+Vote.upVote4 = CreateFrame("Button", nil, Vote, "GameMenuButtonTemplate");
+Vote.upVote4:SetPoint("CENTER", Vote.upVote3, "TOP", 0, -50);
+Vote.upVote4:SetSize(iconSize, iconSize);
+Vote.upVote4:SetNormalTexture(icon_up)
+Vote.upVote4:SetScript("OnClick", function() rating[4] = 1 end)
+
+
+
+Vote.downVote4 = CreateFrame("Button", nil, Vote, "GameMenuButtonTemplate");
+Vote.downVote4:SetPoint("CENTER", Vote.upVote4, "RIGHT", 20, 0);
+Vote.downVote4:SetSize(iconSize, iconSize);
+Vote.downVote4:SetNormalTexture(icon_down)
+Vote.downVote4:SetScript("OnClick", function() rating[4] = -1 end)
+
+Vote.name4 = Vote:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+Vote.name4:SetPoint("CENTER", Vote.name3, "TOP", 0, -44);
+Vote.name4:SetText("Member4")
+
+-- Generate VoteFrame, Sets Party PlayerName and ClassColor also hide Name and Buttons if player not exists
+function generateVoteFrame()
+	for groupindex = 1,MAX_PARTY_MEMBERS do
+		if (GetPartyMember(groupindex)) and groupindex == 1 then
+			name,_ = UnitName("party" .. 1)
+			_, Class = UnitClass("party" .. 1)
+			r,g,b,_ = GetClassColor(Class)
+			Vote.name1:SetTextColor(r,g,b)
+			Vote.name1:SetText(name)
+			Vote.name1:Show()
+			Vote.upVote1:Show()
+			Vote.downVote1:Show()
+		else
+			Vote.name1:Hide()
+			Vote.upVote1:Hide()
+			Vote.downVote1:Hide()
+		end
+		if (GetPartyMember(groupindex)) and groupindex == 2 then
+			name,_ = UnitName("party" .. 2)
+			_, Class = UnitClass("party" .. 2)
+			r,g,b,_ = GetClassColor(Class)
+			Vote.name1:SetTextColor(r,g,b)
+			Vote.name2:SetText(name)
+			Vote.name2:Show()
+			Vote.upVote2:Show()
+			Vote.downVote2:Show()
+		else
+			Vote.name2:Hide()
+			Vote.upVote2:Hide()
+			Vote.downVote2:Hide()
+		end
+		if (GetPartyMember(groupindex)) and groupindex == 3 then
+			name,_ = UnitName("party" .. 3)
+			_, Class = UnitClass("party" .. 3)
+			r,g,b,_ = GetClassColor(Class)
+			Vote.name1:SetTextColor(r,g,b)
+			Vote.name3:SetText(name)
+			Vote.name3:Show()
+			Vote.upVote3:Show()
+			Vote.downVote3:Show()
+		else
+			Vote.name3:Hide()
+			Vote.upVote3:Hide()
+			Vote.downVote3:Hide()
+		end
+		if (GetPartyMember(groupindex)) and groupindex == 4 then
+			name,_ = UnitName("party" .. 4)
+			_, Class = UnitClass("party" .. 4)
+			r,g,b,_ = GetClassColor(Class)
+			Vote.name1:SetTextColor(r,g,b)
+			Vote.name4:SetText(name)
+			Vote.name4:Show()
+			Vote.upVote4:Show()
+			Vote.downVote4:Show()
+		else
+			Vote.name4:Hide()
+			Vote.upVote4:Hide()
+			Vote.downVote4:Hide()
+		end
+	end
+	return GetPartyMember(1)
+end
 -- HandelEvents here
 local function onevent(self, event, arg1, ...)
     if(login and ((event == "ADDON_LOADED" and name == arg1) or (event == "PLAYER_LOGIN"))) then
         login = nil
         frame:UnregisterEvent("ADDON_LOADED")
         frame:UnregisterEvent("PLAYER_LOGIN")
-        init()
+		init()
+		InitializeSavedruns()
 	end
 	if event == 'LFG_LIST_APPLICANT_LIST_UPDATED' then
 		updateLFG(self)
 	end
 	if event == 'GROUP_ROSTER_UPDATE' and GetNumGroupMembers() >= 5 then
 		Score_DeleteData()
+	end
+	if event == "CHALLENGE_MODE_COMPLETED" then
+		updateRunData()
+	end
+	if event == "CHALLENGE_MODE_START" then
+		getStartTime()
 	end
 end
 
