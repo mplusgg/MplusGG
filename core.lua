@@ -13,6 +13,7 @@ local factionID = {
 	Alliance = ""
 }
 
+
 -- Local Vars 
 local AddDatabase
 local dataBaseQueue = {}
@@ -35,6 +36,7 @@ local rating = {
 
 -- Frame for Evenets 
 local frame = CreateFrame("Frame")
+local Vote
 
 
 -- RegisterEvents here
@@ -235,10 +237,10 @@ function getStartTime()
 end
 
 function updatePartyString()
-	local string
+	local string,_ = UnitName("player")
 	for groupindex = 1,MAX_PARTY_MEMBERS do
 		if (UnitExists("party"..groupindex)) then
-			string = string .. "," .. UnitGUID("party" .. groupindex) .. "," .. rating[groupindex]
+			string = string .. "," .. UnitGUID("party" .. groupindex) .. ";" .. rating[groupindex]
 		end
 	end
 	return string
@@ -246,7 +248,7 @@ end
 
 -- Only if not Soloing 
 function updateRunData()
-	if generateVoteFrame() ~= nil then
+	if (generateVoteFrame()) then
 		Vote:Show()
 	end
 end
@@ -255,6 +257,7 @@ function saveRunData()
 	local mapID, level, time, onTime, keystoneUpgradeLevels = C_ChallengeMode.GetCompletionInfo()
 	local instanceId = select(8,GetInstanceInfo())
 	local partyString = updatePartyString()
+
 	MplusGG_Runs[startTime .. "_" .. mapID .. "_" .. instanceId .. "_" .. level] = partyString
 
 end
@@ -263,10 +266,10 @@ end
 --MainFrame
 -------------------
 function createMainFrame()
-	local Vote = CreateFrame("Frame", "Vote_Frame", UIParent, "BasicFrameTemplateWithInset");
+	Vote = CreateFrame("Frame", "Vote_Frame", UIParent, "BasicFrameTemplateWithInset");
 	Vote:SetSize(250, 200);
 	Vote:SetPoint("CENTER"); -- Doesn't need to be ("CENTER", UIParent, "CENTER")
-
+		
 	Vote.title = Vote:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
 	Vote.title:SetPoint("LEFT", Vote.TitleBg, "LEFT", 5, 0);
 	Vote.title:SetText("Rate your Teammates");
@@ -276,7 +279,7 @@ function createMainFrame()
 	Vote:SetScript("OnDragStart", Vote.StartMoving)
 	Vote:SetScript("OnDragStop", Vote.StopMovingOrSizing)
 	Vote:SetScript("OnHide", saveRunData)
-	Vote:Hide()
+	
 -------------------
 -- Buttons
 -------------------
@@ -305,7 +308,7 @@ local r,g,b,_ = GetClassColor(Class)
 	Vote.downVote1:SetScript("OnClick", function() rating[1] = -1 end)
 
 	Vote.name1 = Vote:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
-	Vote.name1:SetPoint("CENTER", Vote, "TOP", -90, -55);
+	Vote.name1:SetPoint("CENTER", Vote, "TOP", -80, -55);
 	Vote.name1:SetText("Member1")
 
 --PartyMember 2
@@ -365,62 +368,63 @@ local r,g,b,_ = GetClassColor(Class)
 	Vote.name4 = Vote:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
 	Vote.name4:SetPoint("CENTER", Vote.name3, "TOP", 0, -44);
 	Vote.name4:SetText("Member4")
+	Vote:Hide()
 end
 -- Generate VoteFrame, Sets Party PlayerName and ClassColor also hide Name and Buttons if player not exists
 function generateVoteFrame()
 	for groupindex = 1,MAX_PARTY_MEMBERS do
-		if (UnitExists("party"..groupindex)) and groupindex == 1 then
-			name,_ = UnitName("party" .. 1)
-			_, Class = UnitClass("party" .. 1)
+		if (UnitExists("party".. groupindex)) then
+			name,_ = UnitName("party1")
+			_, Class = UnitClass("party1")
 			r,g,b,_ = GetClassColor(Class)
 			Vote.name1:SetTextColor(r,g,b)
 			Vote.name1:SetText(name)
 			Vote.name1:Show()
 			Vote.upVote1:Show()
 			Vote.downVote1:Show()
-		else
+		elseif (not UnitExists("party".. groupindex) and groupindex == 1) then
 			Vote.name1:Hide()
 			Vote.upVote1:Hide()
 			Vote.downVote1:Hide()
 		end
-		if (UnitExists("party"..groupindex)) and groupindex == 2 then
-			name,_ = UnitName("party" .. 2)
-			_, Class = UnitClass("party" .. 2)
+		if (UnitExists("party"..groupindex)) then
+			name,_ = UnitName("party2")
+			_, Class = UnitClass("party2")
 			r,g,b,_ = GetClassColor(Class)
-			Vote.name1:SetTextColor(r,g,b)
+			Vote.name2:SetTextColor(r,g,b)
 			Vote.name2:SetText(name)
 			Vote.name2:Show()
 			Vote.upVote2:Show()
 			Vote.downVote2:Show()
-		else
+		elseif (not UnitExists("party".. groupindex) and groupindex == 2) then
 			Vote.name2:Hide()
 			Vote.upVote2:Hide()
 			Vote.downVote2:Hide()
 		end
-		if (UnitExists("party"..groupindex)) and groupindex == 3 then
-			name,_ = UnitName("party" .. 3)
-			_, Class = UnitClass("party" .. 3)
+		if (UnitExists("party"..groupindex)) then
+			name,_ = UnitName("party3")
+			_, Class = UnitClass("party3")
 			r,g,b,_ = GetClassColor(Class)
-			Vote.name1:SetTextColor(r,g,b)
+			Vote.name3:SetTextColor(r,g,b)
 			Vote.name3:SetText(name)
 			Vote.name3:Show()
 			Vote.upVote3:Show()
 			Vote.downVote3:Show()
-		else
+		elseif (not UnitExists("party".. groupindex) and groupindex == 3) then
 			Vote.name3:Hide()
 			Vote.upVote3:Hide()
 			Vote.downVote3:Hide()
 		end
-		if (UnitExists("party"..groupindex)) and groupindex == 4 then
-			name,_ = UnitName("party" .. 4)
-			_, Class = UnitClass("party" .. 4)
+		if (UnitExists("party"..groupindex)) then
+			name,_ = UnitName("party4")
+			_, Class = UnitClass("party4")
 			r,g,b,_ = GetClassColor(Class)
-			Vote.name1:SetTextColor(r,g,b)
+			Vote.name4:SetTextColor(r,g,b)
 			Vote.name4:SetText(name)
 			Vote.name4:Show()
 			Vote.upVote4:Show()
 			Vote.downVote4:Show()
-		else
+		elseif (not UnitExists("party".. groupindex) and groupindex == 4) then
 			Vote.name4:Hide()
 			Vote.upVote4:Hide()
 			Vote.downVote4:Hide()
@@ -492,3 +496,9 @@ frame:SetScript("OnEvent", onevent)
 -- DB Global Handler declaration
 _G.MplusGG = {}
 _G.MplusGG.AddDatabase = AddDatabase
+
+
+SLASH_TEST1 = "/test1"
+SlashCmdList["TEST"] = function(msg)
+	updateRunData()
+ end 
