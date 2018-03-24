@@ -496,9 +496,3 @@ frame:SetScript("OnEvent", onevent)
 -- DB Global Handler declaration
 _G.MplusGG = {}
 _G.MplusGG.AddDatabase = AddDatabase
-
-
-SLASH_TEST1 = "/test1"
-SlashCmdList["TEST"] = function(msg)
-	updateRunData()
- end 
