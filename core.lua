@@ -219,6 +219,7 @@ function getScoreString(name)
 	local characterName, realm = string.match(name, "(.*)-(.*)")
 	if  realm == "" or realm == nil then
 		realm = GetRealmName()
+		characterName = name
 	end
 	fixedCharacterRealm = string.gsub(realm, "%s", "")
 	index = "eu" .. playerFactionString .. db.realmMap[fixedCharacterRealm]
