@@ -21,6 +21,7 @@ local localDatabase
 local login = nil
 local loaded = nil
 local playerFaction
+local playerFactionString
 local wipe = table.wipe
 local showScore = true
 local startTime = 0
@@ -65,6 +66,7 @@ function init()
 		local data = dataBaseQueue[i]
 		factionGroup, factionName = UnitFactionGroup("player")
 		playerFaction = factionID[factionGroup]
+		playerFactionString = faction[factionGroup]
 		if localDatabase and data.faction == playerFaction then
 			if not localDatabase.characters and data.characters then
 				localDatabase.characters = data.characters
@@ -219,7 +221,7 @@ function getScoreString(name)
 		realm = GetRealmName()
 	end
 	fixedCharacterRealm = string.gsub(realm, "%s", "")
-	index = "eu" .. playerFaction .. db.realmMap[fixedCharacterRealm]
+	index = "eu" .. playerFactionString .. db.realmMap[fixedCharacterRealm]
 	for i, name in ipairs(localDatabase.characters[index]) do
 		if name == characterName then
 			temp = localDatabase.scores_karma[index][i]
