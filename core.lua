@@ -219,7 +219,7 @@ function getScoreString(name)
 		realm = GetRealmName()
 	end
 	fixedCharacterRealm = string.gsub(realm, "%s", "")
-	index = "eu_alliance_" .. db.realmMap[fixedCharacterRealm]
+	index = "eu" .. playerFaction .. db.realmMap[fixedCharacterRealm]
 	for i, name in ipairs(localDatabase.characters[index]) do
 		if name == characterName then
 			temp = localDatabase.scores_karma[index][i]
@@ -496,9 +496,3 @@ frame:SetScript("OnEvent", onevent)
 -- DB Global Handler declaration
 _G.MplusGG = {}
 _G.MplusGG.AddDatabase = AddDatabase
-
-
-SLASH_TEST1 = "/test1"
-SlashCmdList["TEST"] = function(msg)
-	updateRunData()
- end 
