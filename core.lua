@@ -214,7 +214,7 @@ function updateLFGVisibility(wide)
 end
 
 function getScoreString(name)
-	local characterName, realm = string.match(name, "(.*)%-/(.*)")
+	local characterName, realm = string.match(name, "(.*)-(.*)")
 	if  realm == "" or realm == nil then
 		realm = GetRealmName()
 	end
