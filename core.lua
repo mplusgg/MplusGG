@@ -25,7 +25,10 @@ local regionMap = {
 local region 
 local AddDatabase
 local dataBaseQueue = {}
-local localDatabase
+local localDatabase = {
+	scores_karma = {},
+	characters = {}
+}
 local login = nil
 local loaded = nil
 local playerFaction
@@ -33,6 +36,7 @@ local playerFactionString
 local wipe = table.wipe
 local showScore = true
 local startTime = 0
+local dbLoaded = 0
 function saveRunData()
 end
 -- RatingArray
@@ -66,6 +70,7 @@ function InitializeSavedruns()
 		MplusGG_Runs = {}
 	end
 	if MplusGG_Config == nil then
+		MplusGG_Config = {}
 		MplusGG_Config.showRate = nil
 	end
 end
@@ -73,13 +78,13 @@ end
 -- Initializes the localDatabase from files
 -- Loads only playerFaction and Region Data 
 function init()
+	factionGroup, factionName = UnitFactionGroup("player")
+	playerFaction = factionID[factionGroup]
+	playerFactionString = faction[factionGroup]
+	region = regionMap[GetCurrentRegion()]
 	for i = #dataBaseQueue, 1 , -1 do
 		local data = dataBaseQueue[i]
-		factionGroup, factionName = UnitFactionGroup("player")
-		playerFaction = factionID[factionGroup]
-		playerFactionString = faction[factionGroup]
-		region = regionMap[GetCurrentRegion()]
-		if localDatabase and data.faction == playerFaction and data.region == region then
+		--[[if localDatabase and data.faction == playerFaction and data.region == region then
 			if not localDatabase.characters and data.characters then
 				localDatabase.characters = data.characters
 			end
@@ -89,6 +94,16 @@ function init()
 		else
 			if data.faction == playerFaction and data.region == region then
 				localDatabase = data
+			end
+		end]]--
+		if	data.faction == playerFaction and data.region == region then
+			if data.characters ~= nil then
+				localDatabase.characters = data.characters
+				dbLoaded = dbLoaded + 1
+			end
+			if data.scores_karma ~= nil then
+				localDatabase.scores_karma = data.scores_karma
+				dbLoaded = dbLoaded + 1
 			end
 		end
 		dataBaseQueue[i] = nil
@@ -106,7 +121,7 @@ end
 local function updateTooltip(characterName, characterRealm, factionGroup)
 	if login == nil and playerFaction == factionID[factionGroup]  and characterRealm ~= "" and characterRealm ~= nil then
 		fixedCharacterRealm = string.gsub(characterRealm, "%s", "");
-		index = "eu" .. faction[factionGroup] .. db.realmMap[fixedCharacterRealm]
+		index = region .. faction[factionGroup] .. db.realmMap[fixedCharacterRealm]
 		for i, name in ipairs(localDatabase.characters[index]) do
 			if name == characterName then
 				temp = localDatabase.scores_karma[index][i]
@@ -124,7 +139,7 @@ end
 -- @para characterName, characterRealm, factionGroup
 local function getCharacterInfo()
 	unit = GameTooltip:GetUnit()
-	if UnitIsPlayer(unit) or UnitIsPlayer("mouseover") then
+	if UnitIsPlayer(unit) or UnitIsPlayer("mouseover") and dbLoaded >= 2 then
 		characterName, characterRealm = UnitName(unit);
 		factionGroup, factionName = UnitFactionGroup(unit)
 		if characterName == nil then
@@ -234,7 +249,7 @@ function getScoreString(name)
 		characterName = name
 	end
 	fixedCharacterRealm = string.gsub(realm, "%s", "")
-	index = "eu" .. playerFactionString .. db.realmMap[fixedCharacterRealm]
+	index = region .. playerFactionString .. db.realmMap[fixedCharacterRealm]
 	for i, name in ipairs(localDatabase.characters[index]) do
 		if name == characterName then
 			temp = localDatabase.scores_karma[index][i]
@@ -470,8 +485,10 @@ local function onevent(self, event, arg1, ...)
 	if event == 'GROUP_ROSTER_UPDATE' and GetNumGroupMembers() >= 5 then
 		Score_DeleteData()
 	end
-	if event == "CHALLENGE_MODE_COMPLETED" and MplusGG_Config.showRate == true then
-		updateRunData()
+	if event == "CHALLENGE_MODE_COMPLETED" then
+		if MplusGG_Config.showRate == true then
+			updateRunData()
+		end
 	end
 	if event == "CHALLENGE_MODE_START" then
 		getStartTime()
