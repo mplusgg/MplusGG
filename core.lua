@@ -57,6 +57,9 @@ function InitializeSavedruns()
 	if MplusGG_Runs == nil then
 		MplusGG_Runs = {}
 	end
+	if MplusGG_Config == nil then
+		MplusGG_Config.showRate = nil
+	end
 end
 
 -- Initializes the localDatabase from files
@@ -458,7 +461,7 @@ local function onevent(self, event, arg1, ...)
 	if event == 'GROUP_ROSTER_UPDATE' and GetNumGroupMembers() >= 5 then
 		Score_DeleteData()
 	end
-	if event == "CHALLENGE_MODE_COMPLETED" then
+	if event == "CHALLENGE_MODE_COMPLETED" and MplusGG_Config.showRate == true then
 		updateRunData()
 	end
 	if event == "CHALLENGE_MODE_START" then
@@ -495,6 +498,18 @@ ScoreCheckButton:SetScript("OnClick", function()
 end)
 GameTooltip:HookScript("OnTooltipSetUnit", getCharacterInfo)
 frame:SetScript("OnEvent", onevent)
+
+-- SHLASH for Test
+SLASH_Mplus_GG1 = "/mplus"
+SlashCmdList["Mplus_GG"] = function(msg)
+	if msg == "test" then
+		updateRunData()
+	elseif msg == "activate" then
+		MplusGG_Config.showRate = true
+	elseif msg == "disable" then
+		MplusGG_Config.showRate = nil
+	end
+ end 
 
 -- DB Global Handler declaration
 _G.MplusGG = {}
