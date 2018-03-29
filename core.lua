@@ -12,9 +12,17 @@ local factionID = {
 	Horde = "1",
 	Alliance = ""
 }
+-- RegionMaping for Databse
+local regionMap = {
+	[1] = "us",
+	[2] = "kr",
+	[3] = "eu",
+	[4] = "tw"
+}
 
 
--- Local Vars 
+-- Local Vars
+local region 
 local AddDatabase
 local dataBaseQueue = {}
 local localDatabase
@@ -70,7 +78,8 @@ function init()
 		factionGroup, factionName = UnitFactionGroup("player")
 		playerFaction = factionID[factionGroup]
 		playerFactionString = faction[factionGroup]
-		if localDatabase and data.faction == playerFaction then
+		region = regionMap[GetCurrentRegion()]
+		if localDatabase and data.faction == playerFaction and data.region == region then
 			if not localDatabase.characters and data.characters then
 				localDatabase.characters = data.characters
 			end
@@ -78,7 +87,7 @@ function init()
 				localDatabase.scores_karma = data.scores_karma
 			end
 		else
-			if data.faction == playerFaction then
+			if data.faction == playerFaction and data.region == region then
 				localDatabase = data
 			end
 		end
