@@ -506,8 +506,10 @@ SlashCmdList["Mplus_GG"] = function(msg)
 		updateRunData()
 	elseif msg == "activate" then
 		MplusGG_Config.showRate = true
+		print("Addon is now showing Ratescreen after Challenge")
 	elseif msg == "disable" then
 		MplusGG_Config.showRate = nil
+		print("Addon is not showing Ratescreen after Challenge anymore")
 	end
  end 
 
