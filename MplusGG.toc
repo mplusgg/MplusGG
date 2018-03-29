@@ -16,3 +16,15 @@ db/db_eu_alliance_characters.lua
 db/db_eu_alliance_score_karma.lua
 db/db_eu_horde_characters.lua
 db/db_eu_horde_score_karma.lua
+db/db_kr_alliance_characters.lua
+db/db_kr_alliance_score_karma.lua
+db/db_kr_horde_characters.lua
+db/db_kr_horde_score_karma.lua
+db/db_tw_alliance_characters.lua
+db/db_tw_alliance_score_karma.lua
+db/db_tw_horde_characters.lua
+db/db_tw_horde_score_karma.lua
+db/db_us_alliance_characters.lua
+db/db_us_alliance_score_karma.lua
+db/db_us_horde_characters.lua
+db/db_us_horde_score_karma.lua
