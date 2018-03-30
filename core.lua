@@ -12,13 +12,6 @@ local factionID = {
 	Horde = "1",
 	Alliance = ""
 }
--- RegionMaping for Databse
-local regionMap = {
-	[1] = "us",
-	[2] = "kr",
-	[3] = "eu",
-	[4] = "tw"
-}
 
 
 -- Local Vars
@@ -79,23 +72,13 @@ end
 -- Loads only playerFaction and Region Data 
 function init()
 	factionGroup, factionName = UnitFactionGroup("player")
+	local guid = UnitGUID("player")
+	local _, server_id, _ = strsplit("-",guid);
 	playerFaction = factionID[factionGroup]
 	playerFactionString = faction[factionGroup]
-	region = regionMap[GetCurrentRegion()]
+	region = db.realmRegionMap[tonumber(server_id)]
 	for i = #dataBaseQueue, 1 , -1 do
 		local data = dataBaseQueue[i]
-		--[[if localDatabase and data.faction == playerFaction and data.region == region then
-			if not localDatabase.characters and data.characters then
-				localDatabase.characters = data.characters
-			end
-			if not localDatabase.scores_karma and data.scores_karma then
-				localDatabase.scores_karma = data.scores_karma
-			end
-		else
-			if data.faction == playerFaction and data.region == region then
-				localDatabase = data
-			end
-		end]]--
 		if	data.faction == playerFaction and data.region == region then
 			if data.characters ~= nil then
 				localDatabase.characters = data.characters

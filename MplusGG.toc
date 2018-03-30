@@ -2,12 +2,13 @@
 ## Title: Mplus.gg
 ## Notes: Shows the Mplus.gg Score in the tooltip and LFG
 ## Author: Lilyelhu & Portmeplz
-## Version: 7.3.5 (@project-version@)
+## Version: 7.3.5 (v1.0-20180329224323)
 ## SavedVariables: MplusGG_Runs
 ## SavedVariablesPerCharacter: MplusGG_Config
 ## X-Website: https://mplus.gg
 
 db/realm_slug_Map.lua
+db/realm_region_Map.lua
 LabelXML.xml
 core.lua
 core.xml
