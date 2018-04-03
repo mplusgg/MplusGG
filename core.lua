@@ -251,9 +251,10 @@ end
 
 function updatePartyString()
 	local string,_ = UnitName("player")
+	string = string .. "," .. UnitGUID("player")
 	for groupindex = 1,MAX_PARTY_MEMBERS do
 		if (UnitExists("party"..groupindex)) then
-			string = string .. "," .. UnitGUID("party" .. groupindex) .. ";" .. rating[groupindex]
+			string = string .. ";" .. UnitName("party" .. groupindex) .. "," .. UnitGUID("party" .. groupindex) .. "," .. rating[groupindex]
 		end
 	end
 	return string
