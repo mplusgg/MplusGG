@@ -249,10 +249,9 @@ function getStartTime()
 	startTime = GetServerTime()
 	local _, level, _, _, _ = C_ChallengeMode.GetCompletionInfo()
 	SetMapToCurrentZone()
-	local mapID, _ = GetCurrentMapAreaID()
-	local instanceId = select(8,GetInstanceInfo())
+	local mapID, _ = select(8,GetInstanceInfo())
 	MplusGG_Runs["startTime"] = startTime
-	MplusGG_Runs[startTime .. "_" .. mapID .. "_" .. instanceId .. "_" .. level] = ""
+	MplusGG_Runs[startTime .. "_" .. mapID .. "_" .. level] = ""
 	MplusGG_Runs["Group"] = {}
 	if (generateVoteFrame()) then
 		for groupindex = 1,MAX_PARTY_MEMBERS do
@@ -276,11 +275,10 @@ end
 function saveRunData()
 	local _, level, _, _, _ = C_ChallengeMode.GetCompletionInfo()
 	SetMapToCurrentZone()
-	local mapID, _ = GetCurrentMapAreaID()
-	local instanceId = select(8,GetInstanceInfo())
+	local mapID = select(8,GetInstanceInfo())
 	local partyString = updatePartyString()
 	local startTime = MplusGG_Runs["startTime"]
-	MplusGG_Runs[startTime .. "_" .. mapID .. "_" .. instanceId .. "_" .. level] = partyString
+	MplusGG_Runs[startTime .. "_" .. mapID .. "_" .. level] = partyString
 
 end
 --Create Vote Frame
