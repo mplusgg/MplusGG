@@ -247,31 +247,39 @@ end
 -- Handel Runs and save to Savedvariables
 function getStartTime()
 	startTime = GetServerTime()
+	local _, level, _, _, _ = C_ChallengeMode.GetCompletionInfo()
+	SetMapToCurrentZone()
+	local mapID, _ = GetCurrentMapAreaID()
+	local instanceId = select(8,GetInstanceInfo())
+	MplusGG_Runs["startTime"] = startTime
+	MplusGG_Runs[startTime .. "_" .. mapID .. "_" .. instanceId .. "_" .. level] = ""
+	MplusGG_Runs["Group"] = {}
+	if (generateVoteFrame()) then
+		for groupindex = 1,MAX_PARTY_MEMBERS do
+			if (UnitExists("party"..groupindex)) then
+				MplusGG_Runs["Group"][groupindex]["name"] = UnitName("party" .. groupindex)
+				MplusGG_Runs["Group"][groupindex]["guid"] = UnitGUID("party" .. groupindex)
+			end
+		end
+	end
 end
 
 function updatePartyString()
 	local string,_ = UnitName("player")
 	string = string .. "," .. UnitGUID("player")
-	for groupindex = 1,MAX_PARTY_MEMBERS do
-		if (UnitExists("party"..groupindex)) then
-			string = string .. ";" .. UnitName("party" .. groupindex) .. "," .. UnitGUID("party" .. groupindex) .. "," .. rating[groupindex]
-		end
+	for groupindex = 1,#MplusGG_Runs["Group"] do
+			string = string .. ";" .. MplusGG_Runs["Group"][groupindex]["name"] .. "," .. MplusGG_Runs["Group"][groupindex]["guid"] .. "," .. rating[groupindex]
 	end
 	return string
 end
 
--- Only if not Soloing 
-function updateRunData()
-	if (generateVoteFrame()) then
-		Vote:Show()
-	end
-end
-
 function saveRunData()
-	local mapID, level, time, onTime, keystoneUpgradeLevels = C_ChallengeMode.GetCompletionInfo()
+	local _, level, _, _, _ = C_ChallengeMode.GetCompletionInfo()
+	SetMapToCurrentZone()
+	local mapID, _ = GetCurrentMapAreaID()
 	local instanceId = select(8,GetInstanceInfo())
 	local partyString = updatePartyString()
-
+	local startTime = MplusGG_Runs["startTime"]
 	MplusGG_Runs[startTime .. "_" .. mapID .. "_" .. instanceId .. "_" .. level] = partyString
 
 end
@@ -292,7 +300,7 @@ function createMainFrame()
 	Vote:RegisterForDrag("LeftButton")
 	Vote:SetScript("OnDragStart", Vote.StartMoving)
 	Vote:SetScript("OnDragStop", Vote.StopMovingOrSizing)
-	Vote:SetScript("OnHide", saveRunData)
+	--Vote:SetScript("OnHide", saveRunData)
 	
 -------------------
 -- Buttons
@@ -382,6 +390,17 @@ local r,g,b,_ = GetClassColor(Class)
 	Vote.name4 = Vote:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
 	Vote.name4:SetPoint("CENTER", Vote.name3, "TOP", 0, -44);
 	Vote.name4:SetText("Member4")
+	
+
+	-- SaveButton
+	Vote.saveVote = CreateFrame("Button", nil, Vote, "GameMenuButtonTemplate");
+	Vote.saveVote:SetPoint("CENTER", Vote.upVote4, "TOP", 0, -50);
+	Vote.saveVote:SetWidth(200)
+	Vote.saveVote:SetHeight(50)
+	Vote.saveVote:SetText("Save!")
+    Vote.saveVote:SetNormalFontObject("GameFontNormalSmall")
+	Vote.saveVote:SetScript("OnClick", saveRunData)
+
 	Vote:Hide()
 end
 -- Generate VoteFrame, Sets Party PlayerName and ClassColor also hide Name and Buttons if player not exists
@@ -470,8 +489,8 @@ local function onevent(self, event, arg1, ...)
 		Score_DeleteData()
 	end
 	if event == "CHALLENGE_MODE_COMPLETED" then
-		if MplusGG_Config.showRate == true then
-			updateRunData()
+		if MplusGG_Config.showRate == true and UnitExists("party1") then
+			Vote:Show()
 		end
 	end
 	if event == "CHALLENGE_MODE_START" then
