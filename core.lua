@@ -289,7 +289,7 @@ end
 -------------------
 function createMainFrame()
 	Vote = CreateFrame("Frame", "Vote_Frame", UIParent, "BasicFrameTemplateWithInset");
-	Vote:SetSize(250, 200);
+	Vote:SetSize(250, 240);
 	Vote:SetPoint("CENTER"); -- Doesn't need to be ("CENTER", UIParent, "CENTER")
 		
 	Vote.title = Vote:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
@@ -320,14 +320,14 @@ local r,g,b,_ = GetClassColor(Class)
 	Vote.upVote1:SetPoint("CENTER", Vote, "TOP", 60, -55);
 	Vote.upVote1:SetSize(iconSize, iconSize);
 	Vote.upVote1:SetNormalTexture(icon_up)
-	Vote.upVote1:SetScript("OnClick", function() rating[1] = 1 end)
+	Vote.upVote1:SetScript("OnClick", function() rating[1] = 1 Vote.upVote1:Disable() Vote.downVote1:Enable() end)
 
 
 	Vote.downVote1 = CreateFrame("Button", nil, Vote, "GameMenuButtonTemplate");
 	Vote.downVote1:SetPoint("CENTER", Vote.upVote1, "RIGHT", 20, 0);
 	Vote.downVote1:SetSize(iconSize, iconSize);
 	Vote.downVote1:SetNormalTexture(icon_down)
-	Vote.downVote1:SetScript("OnClick", function() rating[1] = -1 end)
+	Vote.downVote1:SetScript("OnClick", function() rating[1] = -1 Vote.upVote1:Enable() Vote.downVote1:Disable() end)
 
 	Vote.name1 = Vote:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
 	Vote.name1:SetPoint("CENTER", Vote, "TOP", -80, -55);
@@ -339,14 +339,14 @@ local r,g,b,_ = GetClassColor(Class)
 	Vote.upVote2:SetPoint("CENTER", Vote.upVote1, "TOP", 0, -50);
 	Vote.upVote2:SetSize(iconSize, iconSize);
 	Vote.upVote2:SetNormalTexture(icon_up)
-	Vote.upVote2:SetScript("OnClick", function() rating[2] = 1 end)
+	Vote.upVote2:SetScript("OnClick", function() rating[2] = 1 Vote.upVote2:Disable() Vote.downVote2:Enable() end)
 
 
 	Vote.downVote2 = CreateFrame("Button", nil, Vote, "GameMenuButtonTemplate");
 	Vote.downVote2:SetPoint("CENTER", Vote.upVote2, "RIGHT", 20, 0);
 	Vote.downVote2:SetSize(iconSize, iconSize);
 	Vote.downVote2:SetNormalTexture(icon_down)
-	Vote.downVote2:SetScript("OnClick", function() rating[2] = -1 end)
+	Vote.downVote2:SetScript("OnClick", function() rating[2] = -1 Vote.upVote2:Enable() Vote.downVote2:Disable() end)
 
 	Vote.name2 = Vote:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
 	Vote.name2:SetPoint("CENTER", Vote.name1, "TOP", 0, -45);
@@ -358,14 +358,14 @@ local r,g,b,_ = GetClassColor(Class)
 	Vote.upVote3:SetPoint("CENTER", Vote.upVote2, "TOP", 0, -50);
 	Vote.upVote3:SetSize(iconSize, iconSize);
 	Vote.upVote3:SetNormalTexture(icon_up)
-	Vote.upVote3:SetScript("OnClick", function() rating[3] = 1 end)
+	Vote.upVote3:SetScript("OnClick", function() rating[3] = 1 Vote.upVote3:Disable() Vote.downVote3:Enable() end)
 
 
 	Vote.downVote3 = CreateFrame("Button", nil, Vote, "GameMenuButtonTemplate");
 	Vote.downVote3:SetPoint("CENTER", Vote.upVote3, "RIGHT", 20, 0);
 	Vote.downVote3:SetSize(iconSize, iconSize);
 	Vote.downVote3:SetNormalTexture(icon_down)
-	Vote.downVote3:SetScript("OnClick", function() rating[3] = -1 end)
+	Vote.downVote3:SetScript("OnClick", function() rating[3] = -1 Vote.upVote3:Enable() Vote.downVote3:Disable() end)
 
 	Vote.name3 = Vote:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
 	Vote.name3:SetPoint("CENTER", Vote.name2, "TOP", 0, -41);
@@ -377,7 +377,7 @@ local r,g,b,_ = GetClassColor(Class)
 	Vote.upVote4:SetPoint("CENTER", Vote.upVote3, "TOP", 0, -50);
 	Vote.upVote4:SetSize(iconSize, iconSize);
 	Vote.upVote4:SetNormalTexture(icon_up)
-	Vote.upVote4:SetScript("OnClick", function() rating[4] = 1 end)
+	Vote.upVote4:SetScript("OnClick", function() rating[4] = 1 Vote.upVote4:Disable() Vote.downVote4:Enable() end)
 
 
 
@@ -385,7 +385,7 @@ local r,g,b,_ = GetClassColor(Class)
 	Vote.downVote4:SetPoint("CENTER", Vote.upVote4, "RIGHT", 20, 0);
 	Vote.downVote4:SetSize(iconSize, iconSize);
 	Vote.downVote4:SetNormalTexture(icon_down)
-	Vote.downVote4:SetScript("OnClick", function() rating[4] = -1 end)
+	Vote.downVote4:SetScript("OnClick", function() rating[4] = -1 Vote.upVote4:Enable() Vote.downVote4:Disable() end)
 
 	Vote.name4 = Vote:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
 	Vote.name4:SetPoint("CENTER", Vote.name3, "TOP", 0, -44);
@@ -394,9 +394,9 @@ local r,g,b,_ = GetClassColor(Class)
 
 	-- SaveButton
 	Vote.saveVote = CreateFrame("Button", nil, Vote, "GameMenuButtonTemplate");
-	Vote.saveVote:SetPoint("CENTER", Vote.upVote4, "TOP", 0, -50);
-	Vote.saveVote:SetWidth(200)
-	Vote.saveVote:SetHeight(50)
+	Vote.saveVote:SetPoint("CENTER", Vote, "TOP", 0, -210);
+	Vote.saveVote:SetWidth(220)
+	Vote.saveVote:SetHeight(30)
 	Vote.saveVote:SetText("Save!")
     Vote.saveVote:SetNormalFontObject("GameFontNormalSmall")
 	Vote.saveVote:SetScript("OnClick", saveRunData)
@@ -415,6 +415,8 @@ function generateVoteFrame()
 			Vote.name1:Show()
 			Vote.upVote1:Show()
 			Vote.downVote1:Show()
+			Vote.upVote1:Enable()
+			Vote.downVote1:Enable()
 		elseif (not UnitExists("party".. groupindex) and groupindex == 1) then
 			Vote.name1:Hide()
 			Vote.upVote1:Hide()
@@ -429,6 +431,8 @@ function generateVoteFrame()
 			Vote.name2:Show()
 			Vote.upVote2:Show()
 			Vote.downVote2:Show()
+			Vote.upVote2:Enable()
+			Vote.downVote2:Enable()
 		elseif (not UnitExists("party".. groupindex) and groupindex == 2) then
 			Vote.name2:Hide()
 			Vote.upVote2:Hide()
@@ -443,6 +447,8 @@ function generateVoteFrame()
 			Vote.name3:Show()
 			Vote.upVote3:Show()
 			Vote.downVote3:Show()
+			Vote.upVote3:Enable()
+			Vote.downVote3:Enable()
 		elseif (not UnitExists("party".. groupindex) and groupindex == 3) then
 			Vote.name3:Hide()
 			Vote.upVote3:Hide()
@@ -457,6 +463,8 @@ function generateVoteFrame()
 			Vote.name4:Show()
 			Vote.upVote4:Show()
 			Vote.downVote4:Show()
+			Vote.upVote4:Enable()
+			Vote.downVote4:Enable()
 		elseif (not UnitExists("party".. groupindex) and groupindex == 4) then
 			Vote.name4:Hide()
 			Vote.upVote4:Hide()
@@ -489,7 +497,7 @@ local function onevent(self, event, arg1, ...)
 		Score_DeleteData()
 	end
 	if event == "CHALLENGE_MODE_COMPLETED" then
-		if MplusGG_Config.showRate == true and UnitExists("party1") then
+		if MplusGG_Config.showRate == true then
 			Vote:Show()
 		end
 	end
@@ -532,7 +540,7 @@ frame:SetScript("OnEvent", onevent)
 SLASH_Mplus_GG1 = "/mplus"
 SlashCmdList["Mplus_GG"] = function(msg)
 	if msg == "test" then
-		updateRunData()
+		Vote:Show()
 	elseif msg == "activate" then
 		MplusGG_Config.showRate = true
 		print("Addon is now showing Ratescreen after Challenge")
