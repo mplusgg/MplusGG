@@ -273,10 +273,13 @@ function getStartTime()
 end
 
 function updatePartyString()
+	characterRealm = GetRealmName()
+	fixedCharacterRealm = string.gsub(characterRealm, "%s", "");
 	local string,_ = UnitName("player")
-	string = string .. "," .. UnitGUID("player")
+	string = string .. "," .. UnitGUID("player") .. ";" .. db.realmMap[fixedCharacterRealm]
 	for groupindex = 1,#MplusGG_Meta["Group"] do
-			string = string .. ";" .. MplusGG_Meta["Group"][groupindex]["name"] .. "," .. MplusGG_Meta["Group"][groupindex]["guid"] .. "," .. MplusGG_Meta["Group"][groupindex]["slug"] .. "," .. rating[groupindex]
+			fixedRealm = string.gsub(MplusGG_Meta["Group"][groupindex]["slug"], "%s", "")
+			string = string .. ";" .. MplusGG_Meta["Group"][groupindex]["name"] .. "," .. MplusGG_Meta["Group"][groupindex]["guid"] .. "," .. db.realmMap[fixedRealm] .. "," .. rating[groupindex]
 	end
 	return string
 end
