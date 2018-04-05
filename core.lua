@@ -51,6 +51,7 @@ frame:RegisterEvent("PLAYER_LOGIN")
 frame:RegisterEvent('LFG_LIST_APPLICANT_LIST_UPDATED')
 frame:RegisterEvent("CHALLENGE_MODE_COMPLETED")
 frame:RegisterEvent("CHALLENGE_MODE_START")
+frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
 -- Array for incoming Data
 function AddDatabase(data)
@@ -500,6 +501,16 @@ local function onevent(self, event, arg1, ...)
 	end
 	if event == "CHALLENGE_MODE_START" then
 		getStartTime()
+	end
+	if event == "PLAYER_ENTERING_WORLD" then
+		_, instanceType = IsInInstance()
+		if instanceType == "party" then
+			LoggingCombat(1)
+			print("MplusGG started CombatLogging")
+		elseif instanceType == "none" and LoggingCombat() then
+			LoggingCombat(0)
+			print("MplusGG stopped CombatLogging")
+		end
 	end
 end
 
