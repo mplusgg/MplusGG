@@ -502,7 +502,7 @@ local function onevent(self, event, arg1, ...)
 	if event == "CHALLENGE_MODE_START" then
 		getStartTime()
 	end
-	if event == "PLAYER_ENTERING_WORLD" then
+	if event == "PLAYER_ENTERING_WORLD" and MplusGG_Config.showRate == true then
 		_, instanceType = IsInInstance()
 		if instanceType == "party" then
 			LoggingCombat(1)
