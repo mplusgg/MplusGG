@@ -260,8 +260,13 @@ function getStartTime()
 		for groupindex = 1,MAX_PARTY_MEMBERS do
 			if (UnitExists("party"..groupindex)) then
 				MplusGG_Meta["Group"][groupindex] = {}
-				MplusGG_Meta["Group"][groupindex]["name"] = UnitName("party" .. groupindex)
+				characterName, characterRealm = UnitName("party" .. groupindex);
+				if characterRealm == nil or characterRealm == "" then
+					characterRealm = GetRealmName();
+				end
+				MplusGG_Meta["Group"][groupindex]["name"] = characterName
 				MplusGG_Meta["Group"][groupindex]["guid"] = UnitGUID("party" .. groupindex)
+				MplusGG_Meta["Group"][groupindex]["slug"] = characterRealm
 			end
 		end
 	end
@@ -271,7 +276,7 @@ function updatePartyString()
 	local string,_ = UnitName("player")
 	string = string .. "," .. UnitGUID("player")
 	for groupindex = 1,#MplusGG_Meta["Group"] do
-			string = string .. ";" .. MplusGG_Meta["Group"][groupindex]["name"] .. "," .. MplusGG_Meta["Group"][groupindex]["guid"] .. "," .. rating[groupindex]
+			string = string .. ";" .. MplusGG_Meta["Group"][groupindex]["name"] .. "," .. MplusGG_Meta["Group"][groupindex]["guid"] .. "," .. MplusGG_Meta["Group"][groupindex]["slug"] .. "," .. rating[groupindex]
 	end
 	return string
 end
