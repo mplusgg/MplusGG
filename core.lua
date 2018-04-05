@@ -396,7 +396,7 @@ local r,g,b,_ = GetClassColor(Class)
 	Vote.saveVote:SetHeight(30)
 	Vote.saveVote:SetText("Save!")
     Vote.saveVote:SetNormalFontObject("GameFontNormalSmall")
-	Vote.saveVote:SetScript("OnClick", saveRunData)
+	Vote.saveVote:SetScript("OnClick", function() saveRunData() Vote:Hide() end)
 
 	Vote:Hide()
 end
