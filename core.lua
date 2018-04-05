@@ -67,6 +67,9 @@ function InitializeSavedruns()
 		MplusGG_Config = {}
 		MplusGG_Config.showRate = nil
 	end
+	if MplusGG_Meta == nil then
+		MplusGG_Meta = {}
+	end
 end
 
 -- Initializes the localDatabase from files
@@ -250,14 +253,15 @@ function getStartTime()
 	startTime = GetServerTime()
 	SetMapToCurrentZone()
 	local mapID, _ = select(8,GetInstanceInfo())
-	MplusGG_Runs["startTime"] = startTime
-	MplusGG_Runs["Group"] = {}
+	MplusGG_Meta["region"] = region
+	MplusGG_Meta["startTime"] = startTime
+	MplusGG_Meta["Group"] = {}
 	if (generateVoteFrame()) then
 		for groupindex = 1,MAX_PARTY_MEMBERS do
 			if (UnitExists("party"..groupindex)) then
-				MplusGG_Runs["Group"][groupindex] = {}
-				MplusGG_Runs["Group"][groupindex]["name"] = UnitName("party" .. groupindex)
-				MplusGG_Runs["Group"][groupindex]["guid"] = UnitGUID("party" .. groupindex)
+				MplusGG_Meta["Group"][groupindex] = {}
+				MplusGG_Meta["Group"][groupindex]["name"] = UnitName("party" .. groupindex)
+				MplusGG_Meta["Group"][groupindex]["guid"] = UnitGUID("party" .. groupindex)
 			end
 		end
 	end
@@ -266,8 +270,8 @@ end
 function updatePartyString()
 	local string,_ = UnitName("player")
 	string = string .. "," .. UnitGUID("player")
-	for groupindex = 1,#MplusGG_Runs["Group"] do
-			string = string .. ";" .. MplusGG_Runs["Group"][groupindex]["name"] .. "," .. MplusGG_Runs["Group"][groupindex]["guid"] .. "," .. rating[groupindex]
+	for groupindex = 1,#MplusGG_Meta["Group"] do
+			string = string .. ";" .. MplusGG_Meta["Group"][groupindex]["name"] .. "," .. MplusGG_Meta["Group"][groupindex]["guid"] .. "," .. rating[groupindex]
 	end
 	return string
 end
@@ -277,7 +281,7 @@ function saveRunData()
 	SetMapToCurrentZone()
 	local mapID = select(8,GetInstanceInfo())
 	local partyString = updatePartyString()
-	local startTime = MplusGG_Runs["startTime"]
+	local startTime = MplusGG_Meta["startTime"]
 	MplusGG_Runs[startTime .. "_" .. mapID .. "_" .. level] = partyString
 
 end
