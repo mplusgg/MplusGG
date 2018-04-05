@@ -276,7 +276,7 @@ function updatePartyString()
 	characterRealm = GetRealmName()
 	fixedCharacterRealm = string.gsub(characterRealm, "%s", "");
 	local string,_ = UnitName("player")
-	string = string .. "," .. UnitGUID("player") .. ";" .. db.realmMap[fixedCharacterRealm]
+	string = string .. "," .. UnitGUID("player") .. "," .. db.realmMap[fixedCharacterRealm]
 	for groupindex = 1,#MplusGG_Meta["Group"] do
 			fixedRealm = string.gsub(MplusGG_Meta["Group"][groupindex]["slug"], "%s", "")
 			string = string .. ";" .. MplusGG_Meta["Group"][groupindex]["name"] .. "," .. MplusGG_Meta["Group"][groupindex]["guid"] .. "," .. db.realmMap[fixedRealm] .. "," .. rating[groupindex]
