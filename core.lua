@@ -247,15 +247,14 @@ end
 -- Handel Runs and save to Savedvariables
 function getStartTime()
 	startTime = GetServerTime()
-	local _, level, _, _, _ = C_ChallengeMode.GetCompletionInfo()
 	SetMapToCurrentZone()
 	local mapID, _ = select(8,GetInstanceInfo())
 	MplusGG_Runs["startTime"] = startTime
-	MplusGG_Runs[startTime .. "_" .. mapID .. "_" .. level] = ""
 	MplusGG_Runs["Group"] = {}
 	if (generateVoteFrame()) then
 		for groupindex = 1,MAX_PARTY_MEMBERS do
 			if (UnitExists("party"..groupindex)) then
+				MplusGG_Runs["Group"][groupindex] = {}
 				MplusGG_Runs["Group"][groupindex]["name"] = UnitName("party" .. groupindex)
 				MplusGG_Runs["Group"][groupindex]["guid"] = UnitGUID("party" .. groupindex)
 			end
