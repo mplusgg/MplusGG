@@ -103,15 +103,24 @@ end
 local function getScoreColor(score) 
 	iscore = tonumber(score)
 	if iscore >= tonumber(db.percentile["95+"]) then
-		return 1, 0.501, 0			-- Legendary #ff8000
+		return 1, 0.501, 0,"|cffff8000"					-- Legendary #ff8000
 	elseif iscore >= tonumber(db.percentile["75+"]) then
-		return 0.639, 0.207, 0.933		-- Epic #a335ee
+		return 0.639, 0.207, 0.933,"|cffa335ee"			-- Epic #a335ee
 	elseif iscore >= tonumber(db.percentile["50+"]) then 
-		return 0, 0.439, 0.866			-- Rare #0070dd
+		return 0, 0.439, 0.866,"|cff0070dd"				-- Rare #0070dd
 	elseif iscore >= tonumber(db.percentile["30+"]) then
-		return 0.117, 1, 0			-- Uncommon #1eff00
+		return 0.117, 1, 0,"|cff1eff00"					-- Uncommon #1eff00
 	elseif iscore >= 0 then 
-		return 1, 1, 1				-- Common #ffffff
+		return 1, 1, 1,"|cffffffff"						-- Common #ffffff
+	end
+end
+
+local function getKarmaColor(karma)
+	ikarma = tonumber(karma)
+	if ikarma >= 0 then
+		return 0, 1, 0,"|cff00ff00"	
+	else 
+		return 1, 0, 0,"|cffff0000"	
 	end
 end
 
@@ -131,11 +140,7 @@ local function updateTooltip(characterName, characterRealm, factionGroup)
 				--GameTooltip:AddLine("Score: " .. score)
 				GameTooltip:AddDoubleLine("Score:", score, 1,1,1, r,g,b)
 				--GameTooltip:AddLine("Karma: " .. karma)
-				if tonumber(karma) < 0 then
-					r = 0.7; g = 0; b = 0
-				else
-					r = 0; g = 0.7; b = 0.01
-				end 
+				r,g,b = getKarmaColor(karma) 
 				GameTooltip:AddDoubleLine("Karma:", karma, 1,1,1, r,g,b)
 				return
 			end
@@ -262,9 +267,10 @@ function getScoreString(name)
 	for i, name in ipairs(localDatabase.characters[index]) do
 		if name == characterName then
 			temp = localDatabase.scores_karma[index][i]
-				score = temp:match('[%d]+[_]')
-				karma = temp:match('[_][%d]+')
-					return "Score: " ..score:gsub('[%W]', "") .. " Karma: " .. karma:gsub('[%W]', "")
+			score, karma = string.match(temp,"(.*)_(.*)")
+			_, _, _, scoreColorCode = getScoreColor(score)
+			_, _, _, karmaColorCode = getKarmaColor(karma)
+			return "Score: " .. scoreColorCode .. score .. "|r" .. " Karma: " .. karmaColorCode .. karma .. "|r"
 		end 
 	end 
 	return "No Score available" 
