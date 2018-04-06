@@ -100,6 +100,20 @@ function init()
 	collectgarbage()
 end
 
+local function getScoreColor(score) 
+	iscore = tonumber(score)
+	if iscore >= tonumber(db.percentile["95+"]) then
+		return 1, 0.501, 0			-- Legendary #ff8000
+	elseif iscore >= tonumber(db.percentile["75+"]) then
+		return 0.639, 0.207, 0.933		-- Epic #a335ee
+	elseif iscore >= tonumber(db.percentile["50+"]) then 
+		return 0, 0.439, 0.866			-- Rare #0070dd
+	elseif iscore >= tonumber(db.percentile["30+"]) then
+		return 0.117, 1, 0			-- Uncommon #1eff00
+	elseif iscore >= 0 then 
+		return 1, 1, 1				-- Common #ffffff
+	end
+end
 
 -- Adds Score and Karma to the ToolTip
 -- Checking if player is logged in and data is loaded
@@ -113,8 +127,16 @@ local function updateTooltip(characterName, characterRealm, factionGroup)
 			if name == characterName then
 				temp = localDatabase.scores_karma[index][i]
 				score, karma = string.match(temp,"(.*)_(.*)")
-				GameTooltip:AddLine("Score: " .. score)
-				GameTooltip:AddLine("Karma: " .. karma)
+				r,g,b = getScoreColor(score)
+				--GameTooltip:AddLine("Score: " .. score)
+				GameTooltip:AddDoubleLine("Score:", score, 1,1,1, r,g,b)
+				--GameTooltip:AddLine("Karma: " .. karma)
+				if tonumber(karma) < 0 then
+					r = 0.7; g = 0; b = 0
+				else
+					r = 0; g = 0.7; b = 0.01
+				end 
+				GameTooltip:AddDoubleLine("Karma:", karma, 1,1,1, r,g,b)
 				return
 			end
 		end

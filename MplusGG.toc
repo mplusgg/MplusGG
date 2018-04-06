@@ -9,6 +9,7 @@
 
 db/realm_slug_Map.lua
 db/realm_region_Map.lua
+db/db_metadata.lua
 LabelXML.xml
 core.lua
 core.xml
