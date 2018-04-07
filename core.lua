@@ -103,7 +103,7 @@ function InitializeSavedruns()
 	end
 	if MplusGG_Config == nil then
 		MplusGG_Config = {}
-		MplusGG_Config.showRate = nil
+		MplusGG_Config.showRate = true
 	end
 	if MplusGG_Meta == nil then
 		MplusGG_Meta = {}
