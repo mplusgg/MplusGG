@@ -53,6 +53,44 @@ frame:RegisterEvent("CHALLENGE_MODE_COMPLETED")
 frame:RegisterEvent("CHALLENGE_MODE_START")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
+-- AddonOptionPanel
+function initOptions()
+local optionPanel = CreateFrame("FRAME")
+optionPanel.name = "MplusGG"
+local otitel = optionPanel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+otitel:SetText("|TInterface\\AddOns\\MplusGG\\textures\\Logo:128:128|t")
+otitel:SetPoint("TOPLEFT", optionPanel, "TOPLEFT", 20, -20)
+local author = optionPanel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+author:SetText("Author: Elysai-Blackrock & Portmeplz-Blackrock")
+author:SetPoint("TOPLEFT", otitel, "TOPRight", 20, -40)
+local version = optionPanel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+version:SetText("Version: ".. GetAddOnMetadata("MplusGG", "Version") )
+version:SetPoint("TOPLEFT", otitel, "TOPRight", 20, -70)
+
+optionPanel.showRateScreen = CreateFrame("CheckButton", "showRateScreenCheck", optionPanel, "ChatConfigCheckButtonTemplate");
+optionPanel.showRateScreen:SetPoint("TOPLEFT", optionPanel, "TOPLEFT", 20, -200);
+	getglobal(optionPanel.showRateScreen:GetName() .. 'Text'):SetText("Show Ratescreen at the end of the run");
+	print(optionPanel.showRateScreen:GetName() .. 'Text')
+	optionPanel.showRateScreen:SetChecked(MplusGG_Config.showRate);
+	optionPanel.showRateScreen:SetScript("OnClick", 
+  		function()
+			isChecked = optionPanel.showRateScreen:GetChecked()
+			if isChecked then
+				MplusGG_Config.showRate = nil
+			else
+				MplusGG_Config.showRate = true
+			end
+  		end
+	);
+
+
+
+
+
+
+
+InterfaceOptions_AddCategory(optionPanel)
+end
 -- Array for incoming Data
 function AddDatabase(data)
 	dataBaseQueue[#dataBaseQueue + 1] = data
@@ -327,12 +365,12 @@ end
 -------------------
 function createMainFrame()
 	Vote = CreateFrame("Frame", "Vote_Frame", UIParent, "BasicFrameTemplateWithInset");
-	Vote:SetSize(250, 240);
+	Vote:SetSize(240, 270);
 	Vote:SetPoint("CENTER"); -- Doesn't need to be ("CENTER", UIParent, "CENTER")
 		
 	Vote.title = Vote:CreateFontString(nil, "OVERLAY", "GameFontHighlight");
 	Vote.title:SetPoint("LEFT", Vote.TitleBg, "LEFT", 5, 0);
-	Vote.title:SetText("Rate your Teammates");
+	Vote.title:SetText("Karma");
 	Vote:SetMovable(true)
 	Vote:EnableMouse(true)
 	Vote:RegisterForDrag("LeftButton")
@@ -439,6 +477,22 @@ local r,g,b,_ = GetClassColor(Class)
     Vote.saveVote:SetNormalFontObject("GameFontNormalSmall")
 	Vote.saveVote:SetScript("OnClick", function() saveRunData() Vote:Hide() end)
 
+	-- Checkbox dont show again
+	Vote.dontShowAgain = CreateFrame("CheckButton", "dontShowAgain", Vote, "ChatConfigCheckButtonTemplate");
+	Vote.dontShowAgain:SetPoint("LEFT", Vote.saveVote, "TOP", -110, -50);
+	getglobal(Vote.dontShowAgain:GetName() .. 'Text'):SetText("Dont show this again");
+	Vote.dontShowAgain:SetChecked(not MplusGG_Config.showRate);
+	Vote.dontShowAgain:SetScript("OnClick", 
+  		function()
+			isChecked = Vote.dontShowAgain:GetChecked()
+			if isChecked then
+				MplusGG_Config.showRate = nil
+			else
+				MplusGG_Config.showRate = true
+			end
+  		end
+	);
+
 	Vote:Hide()
 end
 -- Generate VoteFrame, Sets Party PlayerName and ClassColor also hide Name and Buttons if player not exists
@@ -527,6 +581,7 @@ local function onevent(self, event, arg1, ...)
 		InitializeSavedruns()
 		init()
 		createMainFrame()
+		initOptions()
 	end
 	if event == 'LFG_LIST_APPLICANT_LIST_UPDATED' then
 		updateLFG(self)
@@ -585,16 +640,17 @@ GameTooltip:HookScript("OnTooltipSetUnit", getCharacterInfo)
 frame:SetScript("OnEvent", onevent)
 
 -- SHLASH for Test
-SLASH_Mplus_GG1 = "/mplus"
+SLASH_Mplus_GG1 = "/mplusgg"
+SLASH_Mplus_GG2 = "/m+gg"
 SlashCmdList["Mplus_GG"] = function(msg)
 	if msg == "test" then
 		Vote:Show()
 	elseif msg == "activate" then
 		MplusGG_Config.showRate = true
-		print("Addon is now showing Ratescreen after Challenge")
+		print("Addon is now showing Ratescreen at the end of the run")
 	elseif msg == "disable" then
 		MplusGG_Config.showRate = nil
-		print("Addon is not showing Ratescreen after Challenge anymore")
+		print("Addon is not showing Ratescreen at the end of the run anymore")
 	end
  end 
 
