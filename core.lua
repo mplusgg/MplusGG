@@ -183,6 +183,8 @@ local function updateTooltip(characterName, characterRealm, factionGroup)
 				return
 			end
 		end
+		GameTooltip:AddDoubleLine("Score:", "<500", 1,1,1, 1,1,1)
+		return
 	end
 end
 
