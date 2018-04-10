@@ -316,6 +316,26 @@ function getScoreString(name)
 	return "No Score available" 
 end
 
+-- Returns Colored Score and Karma seperate
+function getScoreToolTipString(name)
+	local characterName, realm = string.match(name, "(.*)-(.*)")
+	if  realm == "" or realm == nil then
+		realm = GetRealmName()
+		characterName = name
+	end
+	fixedCharacterRealm = string.gsub(realm, "%s", "")
+	index = region .. playerFactionString .. db.realmMap[fixedCharacterRealm]
+	for i, name in ipairs(localDatabase.characters[index]) do
+		if name == characterName then
+			temp = localDatabase.scores_karma[index][i]
+			score, karma = string.match(temp,"(.*)_(.*)")
+			_, _, _, scoreColorCode = getScoreColor(score)
+			_, _, _, karmaColorCode = getKarmaColor(karma)
+			return true, scoreColorCode .. score .. "|r", karmaColorCode .. karma .. "|r"
+		end
+	end
+	return false, "<500", ""
+end
 -- Handel Runs and save to Savedvariables
 function getStartTime()
 	startTime = GetServerTime()
@@ -588,7 +608,7 @@ local function onevent(self, event, arg1, ...)
 	if event == 'LFG_LIST_APPLICANT_LIST_UPDATED' then
 		activityID = select(2, C_LFGList.GetActiveEntryInfo())
 		categoryID = select(3, C_LFGList.GetActivityInfo(activityID))
-		if (categoryID == 2) then
+		if (categoryID == 2) then -- 2 = dungeons 3 = raids
 			ScoreCheckButton:Show()
 			ScoreCheckButtonText:Show()
 			updateLFG(self)
@@ -649,6 +669,30 @@ ScoreCheckButton:SetScript("OnClick", function()
 		updateLFGVisibility(false)
 	end
 end)
+
+-- Posthook LFGToolTip
+local MplusLFGTooltip;
+local function postHookLFG(tooltip,  resultID, ...)
+	leaderName = select(13, C_LFGList.GetSearchResultInfo(resultID))
+	isDelisted = select(12, C_LFGList.GetSearchResultInfo(resultID))
+	categoryID = select(3, C_LFGList.GetActivityInfo(select(2, C_LFGList.GetSearchResultInfo(resultID))))
+	if(not isDelisted and leaderName ~= nil and 2 == categoryID) then
+		isAvailable, score, karma = getScoreToolTipString(leaderName)
+		if isAvailable then
+			tooltip:AddDoubleLine("Leader Score:", score, 1,1,1, 1,1,1)
+			tooltip:AddDoubleLine("Leader Karma:", karma, 1,1,1, 1,1,1)
+		else
+			tooltip:AddDoubleLine("Leader Score:", score, 1,1,1, 1,1,1)
+		end
+	end
+	return ...
+end
+local oldLFGListUtil_SetSearchEntryTooltip = LFGListUtil_SetSearchEntryTooltip;
+function LFGListUtil_SetSearchEntryTooltip(...)
+	local tooltip,  resultID = ...
+	return postHookLFG(tooltip, resultID, oldLFGListUtil_SetSearchEntryTooltip(tooltip,  resultID, ...))
+end
+
 GameTooltip:HookScript("OnTooltipSetUnit", getCharacterInfo)
 frame:SetScript("OnEvent", onevent)
 
