@@ -251,7 +251,7 @@ function Score_DeleteData()
 	end	
 end
 -- UpdateLFG Score
-local function updateLFG()
+local function updateLFG(self)
 	premadeLocal = {}
 	local children = { LFGListApplicationViewerScrollFrameScrollChild:GetChildren() };
 	for _, child in ipairs(children) do
@@ -586,7 +586,18 @@ local function onevent(self, event, arg1, ...)
 		initOptions()
 	end
 	if event == 'LFG_LIST_APPLICANT_LIST_UPDATED' then
-		updateLFG(self)
+		activityID = select(2, C_LFGList.GetActiveEntryInfo())
+		categoryID = select(3, C_LFGList.GetActivityInfo(activityID))
+		if (categoryID == 2) then
+			ScoreCheckButton:Show()
+			ScoreCheckButtonText:Show()
+			updateLFG(self)
+		else 
+			updateLFGVisibility(false)
+			ScoreCheckButton:Hide()
+			ScoreCheckButtonText:Hide()
+		end
+
 	end
 	if event == 'GROUP_ROSTER_UPDATE' and GetNumGroupMembers() >= 5 then
 		Score_DeleteData()
