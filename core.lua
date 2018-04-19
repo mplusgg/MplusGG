@@ -684,6 +684,7 @@ local function postHookLFG(tooltip,  resultID, ...)
 		else
 			tooltip:AddDoubleLine("Leader Score:", score, 1,1,1, 1,1,1)
 		end
+		tooltip:Show()
 	end
 	return ...
 end
